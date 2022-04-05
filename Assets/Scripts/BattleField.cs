@@ -29,14 +29,19 @@ public class BattleField : MonoBehaviour
         {
             for (int j = 1; j < fieldSize.y + 1; j++)
             {
-                int rndIndexCells = Random.Range(1, cellPrefabs.Count);
+                int rndIndexCellsLandScape = Random.Range(1, 3);
+                int rndIndexCellsBuffDeBuff = Random.Range(3, cellPrefabs.Count);
                 int rndCounerAnotherCells = Random.Range(1, 11);
 
                 if (rndCounerAnotherCells == 1)
-                {
-                    CreateCell(new Vector2Int(i,j), currentCellPosition, cellPrefabs[rndIndexCells]);
+                {                    
+                    CreateCell(new Vector2Int(i, j), currentCellPosition, cellPrefabs[rndIndexCellsLandScape]);
                 }
-                else
+                else if (rndCounerAnotherCells == 2 && i >= 3 && i <= 6)
+                {
+                    CreateCell(new Vector2Int(i, j), currentCellPosition, cellPrefabs[rndIndexCellsBuffDeBuff]);
+                }
+                else 
                 {
                     CreateCell(new Vector2Int(i, j), currentCellPosition, cellPrefabs[0]);
                 }
@@ -95,6 +100,11 @@ public class BattleField : MonoBehaviour
 
             Vector2Int newPlace = new Vector2Int(xPosition, yPosition);
 
+            if (cells[newPlace.x, newPlace.y].SelectUp(Color.white) == false)
+            {
+                return PlaceCharacter(players);
+            }
+
             return newPlace;
         }
         else if (players == Players.Player2)
@@ -103,6 +113,11 @@ public class BattleField : MonoBehaviour
             yPosition = Random.Range(1, 9);
 
             Vector2Int newPlace = new Vector2Int(xPosition, yPosition);
+
+            if (cells[newPlace.x, newPlace.y].SelectUp(Color.white) == false)
+            {
+                return PlaceCharacter(players);
+            }
 
             return newPlace;
         }

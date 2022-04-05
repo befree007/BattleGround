@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4273431309385714822}
   - component: {fileID: 9090214052052161948}
-  - component: {fileID: 3941263040541347754}
   - component: {fileID: 6553970531475490958}
+  - component: {fileID: -29666802212418534}
   m_Layer: 0
-  m_Name: Cell
+  m_Name: BuffCell
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -6522886353871927248, guid: 3765a367fb48f9040bca18add088d6d3,
+  m_Sprite: {fileID: 1436338628549066657, guid: 3765a367fb48f9040bca18add088d6d3,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -87,23 +87,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &3941263040541347754
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 731107776115976902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e98466e384fbf194ba0bbb64eba29305, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  debagTextIndex: {fileID: 2361417728534952427}
-  character: {fileID: 0}
-  highLight: {fileID: 1823334623156225362}
-  selected: 0
-  fieldPosition: {x: 0, y: 0}
 --- !u!61 &6553970531475490958
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -119,7 +102,7 @@ BoxCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
-    border: {x: 0.25, y: 0.35, z: 0.25, w: 0.3}
+    border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 0.85}
     newSize: {x: 1, y: 0.85}
@@ -130,6 +113,23 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 0.85}
   m_EdgeRadius: 0
+--- !u!114 &-29666802212418534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 731107776115976902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 440cb56a38543654aa9cc117ecd61b54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debagTextIndex: {fileID: 2361417728534952427}
+  character: {fileID: 0}
+  highLight: {fileID: 1823334623156225362}
+  selected: 0
+  fieldPosition: {x: 0, y: 0}
 --- !u!1 &1823334623156225362
 GameObject:
   m_ObjectHideFlags: 0

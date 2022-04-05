@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public enum Players
 {
@@ -21,10 +22,20 @@ public enum GameState
 public class GameMaster : MonoBehaviour
 {
     public BattleField battleField;
-    public Character charCreated;
-    public Character charCreated2;
+    public Character warrior;
+    public Character archer;
+    public Character wizard;
     public Character currentCharacter;
     private List<Vector2Int> selectedCells;
+
+    public FieldMoveEvent fieldMoveEvent = new FieldMoveEvent();
+    public ChangeTurnEvent changeTurnEvent = new ChangeTurnEvent();
+    public WinOrLoseEvent winOrLoseEvent = new WinOrLoseEvent();
+
+    public Text textTurnPlayer;
+
+    public Color colorPlayer1;
+    public Color colorPlayer2;
 
     public List<Character> player1Characters = new List<Character>();
     public List<Character> player2Characters = new List<Character>();
@@ -35,13 +46,13 @@ public class GameMaster : MonoBehaviour
 
     void Start()
     {
-        CreateCharacter(Instantiate(charCreated), battleField.PlaceCharacter(Players.Player1), Players.Player1);
-        CreateCharacter(Instantiate(charCreated), battleField.PlaceCharacter(Players.Player1), Players.Player1);
-        CreateCharacter(Instantiate(charCreated), battleField.PlaceCharacter(Players.Player1), Players.Player1);
+        CreateCharacter(Instantiate(warrior), battleField.PlaceCharacter(Players.Player1), Players.Player1, colorPlayer1);
+        CreateCharacter(Instantiate(archer), battleField.PlaceCharacter(Players.Player1), Players.Player1, colorPlayer1);
+        CreateCharacter(Instantiate(wizard), battleField.PlaceCharacter(Players.Player1), Players.Player1, colorPlayer1);
 
-        CreateCharacter(Instantiate(charCreated2), battleField.PlaceCharacter(Players.Player2), Players.Player2);
-        CreateCharacter(Instantiate(charCreated2), battleField.PlaceCharacter(Players.Player2), Players.Player2);
-        CreateCharacter(Instantiate(charCreated2), battleField.PlaceCharacter(Players.Player2), Players.Player2);
+        CreateCharacter(Instantiate(warrior), battleField.PlaceCharacter(Players.Player2), Players.Player2, colorPlayer2);
+        CreateCharacter(Instantiate(archer), battleField.PlaceCharacter(Players.Player2), Players.Player2, colorPlayer2);
+        CreateCharacter(Instantiate(wizard), battleField.PlaceCharacter(Players.Player2), Players.Player2, colorPlayer2);
     }
 
     public void OnCharacterClicked(Cell cell)
@@ -50,7 +61,7 @@ public class GameMaster : MonoBehaviour
         {
             currentCharacter = cell.character;
 
-            List<Vector2Int> moves = currentCharacter.PossibleMoves(cell.fieldPosition, battleField.fieldSize);
+            List<Vector2Int> moves = currentCharacter.PossibleMoves(cell.fieldPosition, battleField.fieldSize, currentCharacter.moveDistance);
 
             selectedCells = battleField.SelectCells(moves, Color.gray, false);
 
@@ -66,7 +77,7 @@ public class GameMaster : MonoBehaviour
 
         if (currentState == GameState.WaitForAttack && currentCharacter == cell.character)
         {
-            List<Vector2Int> attacks = currentCharacter.PossibleAttacks(cell.fieldPosition, battleField.fieldSize);
+            List<Vector2Int> attacks = currentCharacter.PossibleAttacks(cell.fieldPosition, battleField.fieldSize, currentCharacter.rangeAttack);
 
             List<Vector2Int> possibleAttacks = new List<Vector2Int>();
 
@@ -89,7 +100,7 @@ public class GameMaster : MonoBehaviour
 
                 if (CanPlayerMove(currentPlayer) == false)
                 {
-                    ChangePlayer();
+                    ChangePlayer();                    
                 }
 
                 selectedCells = null;
@@ -108,7 +119,8 @@ public class GameMaster : MonoBehaviour
             {
                 if (cell.character != null)
                 {
-                    int health = cell.character.TakeDamage(currentCharacter.GetDamage());                    
+                    int health = cell.character.TakeDamage(currentCharacter.GetDamage());
+                    fieldMoveEvent.Invoke(new FieldMove(cell.character, currentCharacter.transform.parent.GetComponent<Cell>().fieldPosition, cell.fieldPosition, currentPlayer, currentState));
                 }
 
                 battleField.DeSelectCells(selectedCells);
@@ -124,7 +136,9 @@ public class GameMaster : MonoBehaviour
                 currentState = GameState.WaitForMove;                
             }
 
-            Debug.Log($"Выиграл игрок - {CheckWin()}");
+            winOrLoseEvent.Invoke(CheckWin());
+
+            //Debug.Log($"Выиграл игрок - {CheckWin()}");
         }
     }
 
@@ -134,11 +148,12 @@ public class GameMaster : MonoBehaviour
         {
             if (cell.selected == true)
             {
+                fieldMoveEvent.Invoke(new FieldMove(currentCharacter, currentCharacter.transform.parent.GetComponent<Cell>().fieldPosition, cell.fieldPosition, currentPlayer, currentState));
                 MoveCharacter(cell, currentCharacter);
                 battleField.DeSelectCells(selectedCells);
                 selectedCells = null;                
 
-                List<Vector2Int> attacks = currentCharacter.PossibleAttacks(cell.fieldPosition, battleField.fieldSize);
+                List<Vector2Int> attacks = currentCharacter.PossibleAttacks(cell.fieldPosition, battleField.fieldSize, currentCharacter.rangeAttack);
 
                 List<Vector2Int> possibleAttacks = new List<Vector2Int>();
 
@@ -235,13 +250,15 @@ public class GameMaster : MonoBehaviour
         }
     }
 
-    public void CreateCharacter(Character character, Vector2Int position, Players playerSide)
+    public void CreateCharacter(Character character, Vector2Int position, Players playerSide, Color color)
     {
         character.owner = playerSide;
 
         if (battleField.cells[position.x, position.y].character == null)
         {
             battleField.cells[position.x, position.y].SetCharacter(character);
+
+            character.GetComponent<SpriteRenderer>().color = color;
 
             if (playerSide == Players.Player1)
             {
@@ -254,7 +271,7 @@ public class GameMaster : MonoBehaviour
         }
         else
         {
-            CreateCharacter(character, battleField.PlaceCharacter(playerSide), playerSide);
+            CreateCharacter(character, battleField.PlaceCharacter(playerSide), playerSide, color);
         }
     }
 
@@ -294,12 +311,16 @@ public class GameMaster : MonoBehaviour
         {
             currentPlayer = Players.Player2;
             SetCharactersCanMove(player2Characters);
+            textTurnPlayer.text = "Turn: BluePlayer";
         }
         else
         {
             currentPlayer = Players.Player1;
             SetCharactersCanMove(player1Characters);
+            textTurnPlayer.text = "Turn: WhitePlayer";
         }
+
+        changeTurnEvent.Invoke(currentPlayer);
     }
 
     public void SetCharactersCanMove(List<Character> characters)

@@ -50,7 +50,7 @@ public class Cell : MonoBehaviour
         }
     }
 
-    public virtual bool SelectUp(Color color, bool selectCharacter)
+    public virtual bool SelectUp(Color color, bool selectCharacter = true)
     {
         if (character == null && selectCharacter == false)
         {
@@ -74,14 +74,12 @@ public class Cell : MonoBehaviour
         GetComponent<SpriteRenderer>().color = Color.white;
     }
 
-    public void SetCharacter(Character newCharacter)
-    {
-        if (true)
-        {
-
-        }
+    public virtual void SetCharacter(Character newCharacter)
+    {        
         newCharacter.transform.SetParent(this.transform);
-        newCharacter.transform.localPosition = new Vector3(0,0,-9f);
+        newCharacter.transform.localPosition = new Vector3(0,0,-5f);
+        newCharacter.currentAttack = newCharacter.baseAttack;
+        newCharacter.baseHealth = newCharacter.currentHealth;
         character = newCharacter;
     }
 
